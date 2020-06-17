@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 구글 폰트 -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dokdo&family=East+Sea+Dokdo&family=Nanum+Brush+Script&family=Nanum+Pen+Script&family=Source+Code+Pro:ital,wght@1,900&family=Sunflower:wght@300&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+        integrity = "sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin = "anonymous" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <title>원페이지 쇼핑몰|2주차 숙제</title>
+    <script>
+            function make_review() {
+                let name_box = $('#name_box').val();
+                let age_box = $('#age_box').val();
+                let where_box = $('#where_box').val();
+                let day_box = $('#day_box').val();
+
+                if (name_box == ''){
+                    alert('이름을 입력해 주세요.')
+                    return
+                } else if (age_box ==''){
+                    alert('나이를 입력해 주세요.')
+                    return
+                } else if (where_box ==''){
+                    alert('장소를 입력해 주세요.')
+                    return
+                } else if (day_box ==''){
+                    alert('요일을 입력해 주세요')
+                    return
+                }
+                
+                $.ajax({
+                    type: 'POST', // 타입을 작성합니다.
+                    url:'/reviews',//url을 작성합니다.
+                    data:{name_box_give:name_box,age_box_give:age_box,where_box_give:where_box,day_box_give:day_box}, //data를 작성합니다.
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            alert(response['msg']);
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+
+            function listing(){
+                $.ajax({
+                    type:"GET",
+                    url:"/reviews",
+                    data: {},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            let reviews = response['all_review'];
+                            for (let i =0; i< reviews.length; i++ ){
+                                let age_box = reviews[i]['age_box']
+                                let day_box = reviews[i]['day_box']
+                                let name_box = reviews[i]['name_box']
+                                let where_box = reviews[i]['where_box']
+
+                                let temp_html = `<tr>
+                                                    <td>${name_box}</td>
+                                                    <td>${age_box}</td>
+                                                    <td>${where_box}</td>
+                                                    <td>${day_box}</td>
+                                                </tr>`
+                                $('#submit_table2').append(temp_html);
+                            }
+
+                        } else {
+                            alert('리뷰를 받아오지 못했습니다.');
+                        }
+                    }
+                });
+            }
+
+            // 수강신청 테이블 작성
+            // function submit() {
+            //     if ($('#name_box').val() == '') {
+            //         alert("이름을 입력 해주세요!")
+            //     }
+            //     else if ($('#age_box').val() == '') {
+            //         alert("나이를 입력 해주세요!")
+            //     }
+            //     else if ($('#cellnum_box').val() == '') {
+            //         alert("휴대폰번호를 입력 해주세요!")
+            //     }
+            //     else if ($('#where_box').val() == '') {
+            //         alert("장소를 선택 해주세요!")
+            //     }
+            //     else if ($('#day_box').val() == '') {
+            //         alert("요일을 선택 해주세요!")
+            //     }
+            //     else {
+            //         alert("수강 신청 완료!")
+            //         let temp_html =
+            //             '<tr>\
+            //             <td>'+ $('#name_box').val() + '</td>\
+            //             <td>'+ $('#age_box').val() + '</td>\
+            //             <td>'+ $('#where_box').val() + '</td>\
+            //             <td>'+ $('#day_box').val() + '</td>\
+            //         </tr>';
+            //         $('#submit_table2').append(temp_html);
+
+            //     }
+            // }
+        // 웹사이트 실행시 환율 펑션 실행 코드 
+        $(document).ready(function () { exchange_rate() });
+        $(document).ready(function () { listing() });
+        // Json 환율
+        function exchange_rate() {
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: function (response) {
+                    $("#exchange").append(response[1]['rate'])
+                    $("#exchange_realtime").append(response[1]['date'])
+                }
+            })
+        }
+    </script>
+    <style>
+        body {
+            background-color: gainsboro;
+        }
+
+        /* 상품 이미지 */
+        .item_img {
+            width: 450px;
+            height: 300px;
+            border-style: solid;
+            border-color: cornflowerblue;
+            border-radius: 30px;
+            display: block;
+            margin: 30px auto;
+        }
+
+        /* 헤드라인 폰트 */
+        .item_title {
+            font-size: 65px;
+            font-family: 'Black Han Sans', sans-serif;
+        }
+
+        /* 상품 타이틀 폰트 */
+        .item_price {
+            font-size: 60px;
+            font-family: 'East Sea Dokdo', cursive;
+        }
+
+        /* 상품 설명 폰트 */
+        .item_des {
+            font-size: 18px;
+            font-family: 'Sunflower', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 헤드라인 -->
+    <div
+        style="background-color: white; border-radius: 20px; margin-top: 30px; margin-left: 300px; margin-right: 300px;  text-align: center;">
+        <br><span class="item_title">♚스파르타 코딩 클럽♚</span>
+        <!-- 달러/환율 -->
+        <h4>달러/원 환율 : <span id="exchange" style="color: red;"></span>원</h4>
+        (기준시간 : <span id="exchange_realtime"></span>)<br>
+    </div><br>
+    <!-- 본문 -->
+    </div>
+    <div style="background-color: white; width: 40%; margin: auto; border-radius: 30px; text-align: center;">
+        <!-- 상품 이미지 -->
+        <div>
+            <br><img class="item_img"
+                src="https://postfiles.pstatic.net/MjAyMDA0MjFfMTA2/MDAxNTg3NDQwNzQxNjE0.MuUSOxwHAmQ69Xau7VUmIuS9C_PnJpG-8LHX6AHzSmAg.91_ytRb-qvz-n0R88AmgFW-96MCBgvd1orsWX9fHSicg.JPEG.spartacoding/64469369_494088727994862_6320519472461381632_o.jpg?type=w773">
+        </div>
+
+        <!-- 상품 타이틀 -->
+        <div>
+            <span class="item_price">6시간 x 8주, 코딩 왕초보 탈출 !</span><br>
+        </div>
+
+        <!-- 상품 상세설명 -->
+        <div style="background-color: white;">
+            <br><span class="item_des">8명 정원 왕초보 코딩교육,
+                스파르타에서 핵심만 빠르게 배우세요.<br><br>8주 동안 시간 낼 수 있을까, 걱정이라고요?<br><br>
+                <h3><i>"당신의 삶을 충분히 이해하고 만들었습니다."</i></h3><br>
+                만약 한두 번 결석하게 돼도 따라갈 수 있도록,<br>
+                모든 강의를 영상으로 제공하고, 오피스아워를 두었습니다.<br><br>
+                또 숙제를 하고 갈 수 있도록,<br>
+                매 수업 마지막 1시간을 '소화타임'으로 두었습니다.<br><br>
+                <h3><i>"의지만 가지고 오세요."</i></h3><br>
+                이미 많은 수강생들이 증명했습니다.
+            </span><br><br>
+            <hr style="width: 600px;">
+        </div>
+        <!-- 수강 신청 -->
+        <div>
+            <span class="item_price">수 강 신 청</span><br><br>
+        </div>
+        <!-- 이름 -->
+        <div>
+            <div class="form-group row" style="width: 600px; margin: auto;">
+                <label for="inputPassword" class="col-sm-2 col-form-label">이름</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="name_box" placeholder="이름을 입력해주세요.">
+                </div>
+            </div>
+            </form>
+        </div><br>
+        <!-- 나이 -->
+        <div>
+            <div class="form-group row" style="width: 600px; margin: auto;">
+                <label for="inputPassword" class="col-sm-2 col-form-label">나이</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" id="age_box"
+                        placeholder="나이를 입력해주세요. *미성년자는 수강등록이 불가합니다.*">
+                </div>
+            </div>
+            </form>
+        </div><br>
+        <!-- 휴대폰 -->
+        <div>
+            <div class="form-group row" style="width: 600px; margin: auto;">
+                <label for="inputPassword" class="col-sm-2 col-form-label">휴대폰</label>
+                <div class="col-sm-10">
+                    <input type="tel" class="form-control" id="cellnum_box" placeholder="전화번호를 입력해주세요. (010-0000-0000)">
+                </div>
+            </div>
+            </form>
+        </div><br>
+        <!-- 장소선택 -->
+        <div>
+            <div class="form-group row" style="width: 600px; margin: auto;">
+                <label for="inputPassword" class="col-sm-2 col-form-label">장소선택</label>
+                <div class="col-sm-10">
+                    <select type="text" class="custom-select" id="where_box">
+                        <option value="">--장소 선택하기--</option>
+                        <option value="강남권">강남권(강남~선릉)</option>
+                        <option value="강북권">강북권(신촌~종로)</option>
+                    </select>
+                </div>
+            </div>
+            </form>
+        </div><br>
+        <!-- 요일선택 -->
+        <div>
+            <div class="form-group row" style="width: 600px; margin: auto;">
+                <label for="inputPassword" class="col-sm-2 col-form-label">요일선택</label>
+                <div class="col-sm-10">
+                    <select type="text" class="custom-select" id="day_box">
+                        <option value="">--요일 선택하기--</option>
+                        <option value="월수">월/수(오후 7시30분 ~ 오후 10시30분)</option>)
+                        <option value="화목">화/목(오후 7시30분 ~ 오후 10시30분)</option>)
+                        <option value="토">토요일(오후 1시00분 ~ 오후 7시00분)</option>)
+                        <option value="일">일요일(오후 1시00분 ~ 오후 7시00분)</option>)
+                    </select>
+                </div>
+            </div>
+            </form>
+        </div><br>
+        <!-- 결제방식 -->
+        <fieldset class="form-group" style="width: 570px; margin: auto">
+            <div class="row">
+                <legend class="col-form-label col-sm-2 pt-0">결제방식</legend>
+                <div class="col-sm-10">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1"
+                            checked>
+                        <label class="form-check-label" for="gridRadios1">신용카드</label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+                        <label class="form-check-label" for="gridRadios2">카카오 페이</label>
+                    </div>
+                </div>
+            </div>
+        </fieldset><br><br>
+        <!-- 수강신청 버튼 -->
+        <img style="height: 100px; width: 100px;"
+            src="https://platum.kr/wp-content/uploads/2019/12/64497335_490811004989301_7459130390851092480_n.png">
+        <button onclick="make_review()" type="button" class="btn btn-primary btn-lg">수강 신청</button>
+        <img style="height: 100px; width: 100px;"
+            src="https://platum.kr/wp-content/uploads/2019/12/64497335_490811004989301_7459130390851092480_n.png">
+        <hr style="width: 600px;"><br>
+        <!-- 수강신청 현황 -->
+        <div>
+            <span class="item_price">수 강 신 청 현 황</span><br><br>
+            <div style="width: 600px; margin: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">이름</th>
+                            <th scope="col">나이</th>
+                            <th scope="col">장소</th>
+                            <th scope="col">요일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submit_table2">
+                        <tr>
+                            <td>박모씨</td>
+                            <td>21</td>
+                            <td>강남권</td>
+                            <td>월수</td>
+                        </tr>
+                        <tr>
+                            <td>김모씨</td>
+                            <td>22</td>
+                            <td>강북권</td>
+                            <td>화목</td>
+                        </tr>
+                        <tr>
+                            <td>이모씨</td>
+                            <td>20</td>
+                            <td>강남권</td>
+                            <td>토</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <hr>
+            </div>
+        </div>
+        <!-- 최하단 -->
+        <span style="color: lightgray; font-size: 10px;">
+            (주) | 대표자 : 이범규 ㅣ 서울특별시 강남구 영동대로85길 34, 8층 805호 ㅣ사업자 등록번호 : 783-86-01715ㅣ<br>
+            ㅣ전화 : 010-7127-4503 ㅣ 통신판매업 신고번호 : 2020-서울강남-02300 ㅣ<br>
+            contact@teamsparta.co</span><br>
+    </div>
+</body>
+
+</html>
